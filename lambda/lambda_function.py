@@ -1,3 +1,8 @@
+"""
+AWS Serverless Visitor Counter
+
+API Gateway -> Lambda -> DynamoDB
+"""
 import json
 import boto3
 
