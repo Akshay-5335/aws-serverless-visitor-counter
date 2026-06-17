@@ -2,54 +2,222 @@
 
 ## Overview
 
-A serverless visitor counter built using AWS Lambda, API Gateway, and DynamoDB.
+A serverless visitor counter application built using AWS Lambda, API Gateway, DynamoDB, IAM, and Terraform.
 
-Every API request increments the visitor count and stores the updated value in DynamoDB.
+The application exposes a public API endpoint that increments and returns the current visitor count. All infrastructure components are provisioned and managed using Terraform.
+
+---
 
 ## Architecture
 
-API Gateway → Lambda → DynamoDB
+┌─────────┐
+│ Client  │
+└────┬────┘
+     │
+     ▼
+┌─────────────┐
+│ API Gateway │
+└────┬────────┘
+     │
+     ▼
+┌──────────┐
+│  Lambda  │
+└────┬─────┘
+     │
+     ▼
+┌──────────┐
+│ DynamoDB │
+└──────────┘
 
-## AWS Services Used
+---
 
-- AWS Lambda
-- Amazon DynamoDB
-- Amazon API Gateway
-- IAM
-- CloudWatch
+## Technologies Used
+
+### Cloud Services
+
+* AWS Lambda
+* Amazon API Gateway
+* Amazon DynamoDB
+* AWS IAM
+* Amazon CloudWatch
+
+### Infrastructure as Code
+
+* Terraform
+
+### Programming Language
+
+* Python 3.13
+
+### Version Control
+
+* Git
+* GitHub
+
+---
 
 ## Features
 
-- Increment visitor count
-- Store count in DynamoDB
-- Expose public API endpoint
-- Serverless architecture
+* Serverless architecture
+* Public API endpoint
+* Visitor count tracking
+* DynamoDB data persistence
+* Infrastructure provisioning using Terraform
+* CloudWatch logging
+* IAM-based access control
+
+---
+
+## Project Structure
+
+```text
+aws-serverless-visitor-counter/
+│
+├── lambda/
+│   ├── lambda_function.py
+│   └── visitor-counter.zip
+│
+├── terraform/
+│   ├── main.tf
+│   └── .terraform.lock.hcl
+│
+├── screenshots/
+│
+├── README.md
+└── .gitignore
+```
+
+---
+
+## Infrastructure Provisioned by Terraform
+
+The following resources are created and managed using Terraform:
+
+* DynamoDB Table
+* Lambda Function
+* IAM Role
+* Lambda Basic Execution Policy
+* DynamoDB Access Policy
+* API Gateway
+* API Gateway Route
+* Lambda Permissions
+
+---
+
+## API Endpoint
+
+### Request
+
+```http
+GET /visit
+```
+
+### Sample Response
+
+```json
+{
+  "visitor_count": 20
+}
+```
+
+---
+
+## Deployment
+
+### Initialize Terraform
+
+```bash
+terraform init
+```
+
+### Validate Configuration
+
+```bash
+terraform validate
+```
+
+### Review Changes
+
+```bash
+terraform plan
+```
+
+### Deploy Infrastructure
+
+```bash
+terraform apply
+```
+
+### Destroy Infrastructure
+
+```bash
+terraform destroy
+```
+
+---
+
+## Screenshots
 
 ### DynamoDB Table
 
 ![DynamoDB](screenshots/dynamodb-table.png)
 
-### Lambda Test
+### Lambda Function
 
-![Lambda](screenshots/lambda-test.png)
+![Lambda](screenshots/lambda.png)
 
 ### API Gateway
 
 ![API](screenshots/api-gateway.png)
 
-### Browser Response
+### Terraform Apply Output
+
+![output](screenshots/terraform-output.png)
+
+### Browser/API Response
 
 ![Response](screenshots/browser-response.png)
 
-## Sample Response
+---
 
-{
-  "visitor_count": 10
-}
+## Learning Outcomes
 
-## Future Enhancements
+This project demonstrates:
 
-- Frontend integration
-- CI/CD using GitHub Actions
-- Infrastructure as Code using Terraform
-- Custom domain
+* Infrastructure as Code (Terraform)
+* Serverless Application Development
+* AWS Lambda Deployment
+* API Gateway Integration
+* DynamoDB Operations
+* IAM Role and Policy Management
+* Terraform State Management
+* Git and GitHub Version Control
+
+---
+
+## Future Improvements
+
+* Use Lambda Environment Variables
+* Split Terraform configuration into multiple files
+* Configure Remote Terraform State using S3
+* Add GitHub Actions CI/CD Pipeline
+* Add Custom Domain for API Gateway
+* Add Monitoring and Alerting
+* Implement Automated Testing
+
+---
+
+## Notes
+
+Terraform provider binaries are excluded using `.gitignore`.
+
+For production environments, Terraform state should be stored remotely using an S3 backend instead of local state files.
+
+## Key Learning
+
+This project was initially created manually using AWS services and was later migrated to Infrastructure as Code using Terraform. This helped automate provisioning and improve infrastructure consistency and repeatability.
+
+
+## Author
+
+Akshay Sunil
