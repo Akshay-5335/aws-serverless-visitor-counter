@@ -13,6 +13,8 @@ resource "aws_dynamodb_table" "visitor_counter" {
     type = "S"
   }
 }
+
+
 resource "aws_iam_role" "lambda_role" {
   name = "visitor-counter-lambda-role"
 
@@ -29,10 +31,14 @@ resource "aws_iam_role" "lambda_role" {
     ]
   })
 }
+
+
 resource "aws_iam_role_policy_attachment" "lambda_basic" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+
+
 resource "aws_lambda_function" "visitor_counter" {
 
   function_name = "VisitorCounterTerraform"
@@ -47,6 +53,8 @@ resource "aws_lambda_function" "visitor_counter" {
 
   source_code_hash = filebase64sha256("../lambda/visitor-counter.zip")
 }
+
+
 resource "aws_iam_role_policy" "dynamodb_access" {
 
   name = "visitor-counter-dynamodb-policy"
@@ -70,4 +78,59 @@ resource "aws_iam_role_policy" "dynamodb_access" {
       }
     ]
   })
+}
+
+
+resource "aws_apigatewayv2_api" "visitor_api" {
+  name          = "visitor-counter-api"
+  protocol_type = "HTTP"
+}
+
+
+resource "aws_apigatewayv2_integration" "lambda_integration" {
+
+  api_id = aws_apigatewayv2_api.visitor_api.id
+
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.visitor_counter.invoke_arn
+  integration_method     = "POST"
+  payload_format_version = "2.0"
+}
+
+
+resource "aws_apigatewayv2_route" "visit_route" {
+
+  api_id = aws_apigatewayv2_api.visitor_api.id
+
+  route_key = "GET /visit"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+
+resource "aws_apigatewayv2_stage" "prod" {
+
+  api_id = aws_apigatewayv2_api.visitor_api.id
+
+  name = "prod"
+
+  auto_deploy = true
+}
+
+
+resource "aws_lambda_permission" "api_gateway" {
+
+  statement_id = "AllowExecutionFromAPIGateway"
+  action       = "lambda:InvokeFunction"
+
+  function_name = aws_lambda_function.visitor_counter.function_name
+
+  principal = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.visitor_api.execution_arn}/*/*"
+}
+
+
+output "api_endpoint" {
+  value = aws_apigatewayv2_api.visitor_api.api_endpoint
 }
